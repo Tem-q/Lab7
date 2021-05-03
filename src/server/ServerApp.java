@@ -10,7 +10,7 @@ public class ServerApp {
             System.out.println("No driver to connect to the database");
         }
         String jdbcURL = "jdbc:postgresql://localhost:9999/studs";
-        DatabaseManager manager = new DatabaseManager(jdbcURL, "", "");
+        DatabaseManager manager = new DatabaseManager(jdbcURL, "username", "password");
         manager.connectionToDatabase();
 
         DragonCollection dragonCollection = new DragonCollection();
