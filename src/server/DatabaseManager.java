@@ -76,26 +76,44 @@ public class DatabaseManager {
         return dragon;
     }
 
-    public void add(Dragon dragon) {
-        String request = "INSERT INTO dragons VALUES (nextval('id'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public String show(DragonCollection dragonCollection) {
+        String request = "SELECT*FROM dragons";
         try {
             PreparedStatement statement = connection.prepareStatement(request);
-            statement.setString(1, dragon.getName());
-            statement.setLong(2, dragon.getCoordinates().getX());
-            statement.setDouble(3, dragon.getCoordinates().getY());
-            statement.setDate(4, Date.valueOf(dragon.getCreationDate()));
-            statement.setLong(5, dragon.getAge());
-            statement.setString(6, dragon.getDescription());
-            statement.setInt(7, dragon.getWeight());
-            statement.setString(8, String.valueOf(dragon.getType()));
-            statement.setString(9, dragon.getKiller().getName());
-            statement.setFloat(10, dragon.getKiller().getHeight());
-            statement.setLong(11, dragon.getKiller().getWeight());
-            statement.setFloat(12, dragon.getKiller().getLocation().getX());
-            statement.setInt(13, dragon.getKiller().getLocation().getY());
-            statement.setFloat(14,  dragon.getKiller().getLocation().getZ());
-            statement.setString(15,  dragon.getKiller().getLocation().getName());
-            statement.setString(16, user.getUsername());
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                Dragon dragon = getDragon(result);
+                dragonCollection.addFromDatabase(dragon);
+            }
+            statement.executeQuery();
+            statement.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return "";
+    }
+
+    public void add(Dragon dragon) {
+        String request = "INSERT INTO dragons VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(request);
+            statement.setInt(1, dragon.getId());
+            statement.setString(2, dragon.getName());
+            statement.setLong(3, dragon.getCoordinates().getX());
+            statement.setDouble(4, dragon.getCoordinates().getY());
+            statement.setDate(5, Date.valueOf(dragon.getCreationDate()));
+            statement.setLong(6, dragon.getAge());
+            statement.setString(7, dragon.getDescription());
+            statement.setInt(8, dragon.getWeight());
+            statement.setString(9, String.valueOf(dragon.getType()));
+            statement.setString(10, dragon.getKiller().getName());
+            statement.setFloat(11, dragon.getKiller().getHeight());
+            statement.setLong(12, dragon.getKiller().getWeight());
+            statement.setFloat(13, dragon.getKiller().getLocation().getX());
+            statement.setInt(14, dragon.getKiller().getLocation().getY());
+            statement.setFloat(15,  dragon.getKiller().getLocation().getZ());
+            statement.setString(16,  dragon.getKiller().getLocation().getName());
+            statement.setString(17, user.getUsername());
             statement.executeUpdate();
             statement.close();
         } catch (SQLException throwables) {
@@ -177,8 +195,12 @@ public class DatabaseManager {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 if (resultSet.getString(1).equals(newUser.getUsername())) {
-                    checkUserForExistence = true;
-                    break;
+                    if (resultSet.getString(2).equals(toSHS224(newUser.getPassword()))) {
+                        checkUserForExistence = true;
+                        break;
+                    } else {
+                        return "Wrong password";
+                    }
                 }
             }
             if (checkUserForExistence) {

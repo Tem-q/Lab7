@@ -1,4 +1,4 @@
-package server;
+/*package server;
 
 import data.DataForClient;
 
@@ -47,4 +47,4 @@ public class ServerForWriting extends Thread {
         objectOutputStream.close();
         return buffer;
     }
-}
+}*/
